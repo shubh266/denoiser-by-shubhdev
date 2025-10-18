@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbe9"/>
+      <stop offset="100%" stop-color="#bfa436"/>
+    </radialGradient>
+  </defs>
+  <circle cx="96" cy="96" r="92" fill="url(#g)" stroke="#153464" stroke-width="6"/>
+  <ellipse cx="96" cy="96" rx="70" ry="70" fill="none" stroke="#153464" stroke-width="3.5" opacity=".13"/>
+  <ellipse cx="96" cy="96" rx="55" ry="55" fill="none" stroke="#bfa436" stroke-width="2" opacity=".22"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-weight="bold" font-family="Montserrat,Arial,sans-serif" font-size="70" dy=".07em" fill="#153464" letter-spacing="-5">DN</text>
+</svg>
