@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyo
+
+# Editor/OS junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+
+# Flask temp folders
+instance/
+.webassets-cache
+
+# Local runtime artifacts that should not sync to remote:
+uploads/
+outputs/
+*.log
+
+# Do not ignore these!
+!static/
+!templates/
