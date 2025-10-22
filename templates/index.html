@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>DeNoiser By ShubhDev</title>
+    <title>DeNoiser By ShubhDev - 3D Audio Magic</title>
     <meta name="theme-color" content="#bfa436">
-    <meta property="og:title" content="DeNoiser By ShubhDev – AI audio noise removal">
+    <meta property="og:title" content="DeNoiser By ShubhDev – 3D AI Audio Noise Removal">
     <meta property="og:description"
-        content="Remove background noise from any audio with style. Batch upload, denoise, download.">
+        content="Experience the future of audio cleaning with our 3D-powered AI noise removal technology. Immersive, fast, and magical.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/static/icon512.png">
     <meta name="description"
-        content="DeNoiser By ShubhDev: AI noise remover. Drag & drop, preview, batch, download zip, dark mode & more!">
+        content="DeNoiser By ShubhDev: Revolutionary 3D AI audio denoiser. Immersive experience, batch processing, real-time visualization & more!">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,10 +21,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/icon180.png">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon.svg">
-    <!-- Optionally: fallback to old PNG/ICO for legacy browsers if desired -->
     <link rel="icon" type="image/png" sizes="512x512" href="/static/icon512.png">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&family=Inter:wght@400;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500;800&family=Inter:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap"
         rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     {% raw %}
     <style>
         html,
@@ -34,18 +35,97 @@
             padding: 0;
             font-family: 'Inter', 'Montserrat', Arial, sans-serif;
             font-size: clamp(15px, 2.7vw, 19px);
-            background: #f7f7f7;
+            background: #0a0a0a;
+            overflow-x: hidden;
         }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(0deg, #faf9f6 0%, #ececec 100%);
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
             transition: background .5s;
+            perspective: 1000px;
+        }
+
+        /* 3D Background Elements */
+        .bg-3d-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #bfa436, #ffd700);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 1s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 3s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 4s; }
+        .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 5s; }
+        .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: 1.5s; }
+        .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: 2.5s; }
+        .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: 3.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            50% { transform: translateY(-20vh) rotate(180deg); }
+        }
+
+        /* Audio Wave Visualization */
+        .audio-waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(191, 164, 54, 0.1) 25%, 
+                rgba(191, 164, 54, 0.3) 50%, 
+                rgba(191, 164, 54, 0.1) 75%, 
+                transparent 100%);
+            animation: wave-motion 3s ease-in-out infinite;
+        }
+
+        .wave:nth-child(2) { animation-delay: 0.5s; opacity: 0.7; }
+        .wave:nth-child(3) { animation-delay: 1s; opacity: 0.5; }
+
+        @keyframes wave-motion {
+            0%, 100% { transform: scaleX(0.8) translateY(0); }
+            50% { transform: scaleX(1.2) translateY(-20px); }
         }
 
         :root {
@@ -59,12 +139,16 @@
         }
 
         body.dark {
-            background: linear-gradient(0deg, #181d23 0%, #272b31 100%);
+            background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a1a2e 35%, #000000 100%);
         }
 
         body.dark .container {
-            background: #232531;
-            box-shadow: 0 0px 32px 0 #111a25d8;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 0 0 1px rgba(191, 164, 54, 0.3);
             color: #f5f5f5;
         }
 
@@ -79,13 +163,13 @@
         }
 
         body.dark .upload-area {
-            background: #181d26;
-            border-color: #44495a;
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(191, 164, 54, 0.4);
         }
 
         body.dark .upload-area:hover,
         body.dark .upload-area.dragover {
-            background: #272634;
+            background: rgba(191, 164, 54, 0.15);
             border-color: #f7c873;
         }
 
@@ -218,32 +302,46 @@
         }
 
         .container {
-            background: #fff;
-            border-radius: clamp(10px, 2vw, 18px);
-            box-shadow: 0 4px 32px 0 rgba(33, 42, 77, 0.13);
-            padding: clamp(18px, 6vw, 58px) clamp(8px, 4vw, 34px) clamp(20px, 6vw, 36px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: clamp(20px, 3vw, 30px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 0 1px rgba(191, 164, 54, 0.2);
+            padding: clamp(25px, 7vw, 70px) clamp(15px, 5vw, 45px) clamp(25px, 7vw, 45px);
             max-width: 98vw;
             width: 100%;
             min-width: 0;
-            max-width: 470px;
+            max-width: 520px;
             text-align: center;
-            z-index: 2;
+            z-index: 10;
             position: relative;
-            animation: containerIn .7s cubic-bezier(.33, 1.53, .42, .91) forwards;
+            animation: containerIn3D 1s cubic-bezier(.33, 1.53, .42, .91) forwards;
             opacity: 0;
             margin-top: clamp(8px, 8vw, 48px);
             margin-bottom: clamp(12px, 8vw, 44px);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
         }
 
-        @keyframes containerIn {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .container:hover {
+            transform: translateY(-10px) rotateX(5deg);
+        }
 
-            from {
+        @keyframes containerIn3D {
+            0% {
                 opacity: 0;
-                transform: scale(.98);
+                transform: translateY(50px) rotateX(-20deg) scale(0.8);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateY(-10px) rotateX(5deg) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
             }
         }
 
@@ -251,8 +349,18 @@
             .container {
                 max-width: 99vw;
                 padding: 7vw 2vw 16vw;
-                border-radius: 13px;
-                box-shadow: 0 1.5px 13px #15346415;
+                border-radius: 20px;
+                box-shadow: 
+                    0 4px 20px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .bg-3d-container {
+                display: none; /* Hide 3D elements on mobile for performance */
+            }
+
+            #audioVisualizer {
+                display: none; /* Hide 3D visualizer on mobile */
             }
         }
 
@@ -261,32 +369,75 @@
         }
 
         .header h1 {
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            font-size: clamp(1.25em, 5vw, 2.2em);
-            margin: 0 0 6px;
-            color: #153464;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px #faf9f6a8;
+            font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.5em, 6vw, 2.8em);
+            margin: 0 0 15px;
+            background: linear-gradient(135deg, #bfa436 0%, #ffd700 50%, #bfa436 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 20px rgba(191, 164, 54, 0.5),
+                0 0 40px rgba(191, 164, 54, 0.3),
+                0 0 60px rgba(191, 164, 54, 0.1);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+            transform: translateZ(20px);
+        }
+
+        @keyframes titleGlow {
+            0% { 
+                text-shadow: 
+                    0 0 20px rgba(191, 164, 54, 0.5),
+                    0 0 40px rgba(191, 164, 54, 0.3),
+                    0 0 60px rgba(191, 164, 54, 0.1);
+            }
+            100% { 
+                text-shadow: 
+                    0 0 30px rgba(191, 164, 54, 0.8),
+                    0 0 60px rgba(191, 164, 54, 0.5),
+                    0 0 90px rgba(191, 164, 54, 0.2);
+            }
         }
 
         .header p {
-            color: #626872;
-            font-size: clamp(1em, 3vw, 1.15em);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(1.1em, 3.5vw, 1.3em);
             font-weight: 500;
-            letter-spacing: .1px;
+            letter-spacing: .5px;
             margin-bottom: 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transform: translateZ(10px);
         }
 
         .upload-area {
-            border: 2.5px dashed #abb2bc;
-            border-radius: clamp(11px, 2vw, 18px);
-            padding: clamp(17px, 6vw, 35px) 3vw;
-            margin: clamp(18px, 4vw, 32px) 0 clamp(6px, 2vw, 16px);
-            transition: border-color 0.25s, background 0.28s, box-shadow .25s;
+            border: 2.5px dashed rgba(191, 164, 54, 0.3);
+            border-radius: clamp(15px, 3vw, 25px);
+            padding: clamp(25px, 8vw, 45px) 4vw;
+            margin: clamp(25px, 5vw, 40px) 0 clamp(10px, 3vw, 20px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
-            background: #f2f2f6;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
             position: relative;
+            transform-style: preserve-3d;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(191, 164, 54, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
         }
 
         @media (max-width:500px) {
@@ -298,43 +449,77 @@
         .upload-area:hover,
         .upload-area.dragover {
             border-color: #bfa436;
-            background: #faf3e5;
-            box-shadow: 0 2px 12px #bfa43622;
+            background: rgba(191, 164, 54, 0.1);
+            box-shadow: 
+                0 10px 30px rgba(191, 164, 54, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px) rotateX(5deg);
         }
 
         .upload-icon {
-            width: clamp(32px, 7vw, 60px);
-            height: clamp(32px, 7vw, 60px);
+            width: clamp(50px, 10vw, 80px);
+            height: clamp(50px, 10vw, 80px);
             display: inline-block;
-            margin-bottom: clamp(2px, 3vw, 17px);
-            transition: transform .28s cubic-bezier(.36, 1.6, .48, .87);
-            animation: bounce 2.5s infinite alternate cubic-bezier(.36, 1.6, .48, .87);
+            margin-bottom: clamp(5px, 4vw, 20px);
+            transition: all .4s cubic-bezier(.36, 1.6, .48, .87);
+            animation: bounce3D 3s infinite alternate cubic-bezier(.36, 1.6, .48, .87);
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .upload-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(191, 164, 54, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: pulse 2s infinite;
         }
 
         .upload-area:hover .upload-icon,
         .upload-area.dragover .upload-icon {
-            transform: scale(1.14) rotate(-6deg);
+            transform: scale(1.2) rotateY(15deg) rotateX(10deg);
         }
 
-        @keyframes bounce {
-            from {
-                transform: translateY(0px);
+        @keyframes bounce3D {
+            0% {
+                transform: translateY(0px) rotateY(0deg);
             }
+            50% {
+                transform: translateY(-10px) rotateY(180deg);
+            }
+            100% {
+                transform: translateY(0px) rotateY(360deg);
+            }
+        }
 
-            to {
-                transform: translateY(-8px);
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
             }
         }
 
         .upload-text {
-            font-size: clamp(1em, 3vw, 1.08em);
-            color: #3e456b;
-            margin-bottom: 7px;
+            font-size: clamp(1.1em, 3.5vw, 1.2em);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .upload-hint {
-            font-size: clamp(1em, 3vw, 1.08em);
-            color: #989575;
+            font-size: clamp(1em, 3vw, 1.1em);
+            color: rgba(191, 164, 54, 0.8);
+            font-weight: 500;
         }
 
         #fileInput {
@@ -406,34 +591,56 @@
         }
 
         .process-btn {
-            background: linear-gradient(90deg, #153464 0%, #bfa436 100%);
-            color: white;
+            background: linear-gradient(135deg, #bfa436 0%, #ffd700 50%, #bfa436 100%);
+            color: #1a1a2e;
             border: none;
-            padding: clamp(11px, 2vw, 18px) 0;
-            font-size: clamp(.98em, 2.8vw, 1.15em);
-            border-radius: 24px;
+            padding: clamp(15px, 3vw, 22px) 0;
+            font-size: clamp(1.1em, 3vw, 1.3em);
+            border-radius: 30px;
             cursor: pointer;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            transition: box-shadow .26s, transform .08s, background .31s;
-            margin: clamp(16px, 3vw, 24px) 0;
+            font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+            font-weight: 800;
+            transition: all .4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            margin: clamp(20px, 4vw, 30px) 0;
             max-width: 95vw;
-            letter-spacing: 0.01em;
-            box-shadow: 0 4px 16px 0 #bfa43616;
+            letter-spacing: 1px;
+            box-shadow: 
+                0 8px 25px rgba(191, 164, 54, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
             outline: none;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .process-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .process-btn:hover::before {
+            left: 100%;
         }
 
         .process-btn:disabled {
-            background: #edeaea;
-            color: #b2b2b2;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
             cursor: not-allowed;
             box-shadow: none;
         }
 
         .process-btn:hover {
-            box-shadow: 0 7px 18px 0 #bfa43633;
-            transform: translateY(-1.5px) scale(1.012);
-            background: linear-gradient(90deg, #bfa436 7%, #153464 90%);
+            box-shadow: 
+                0 15px 35px rgba(191, 164, 54, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.05) rotateX(5deg);
+            background: linear-gradient(135deg, #ffd700 0%, #bfa436 50%, #ffd700 100%);
         }
 
         .progress-container {
@@ -512,12 +719,17 @@
         }
 
         .supported-formats {
-            margin-top: clamp(21px, 4vw, 39px);
-            padding: clamp(12px, 3vw, 25px) 1vw 7px;
-            background: #f8f8f8;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px #bfa4360b;
-            font-size: clamp(.97em, 2vw, 1em);
+            margin-top: clamp(25px, 5vw, 45px);
+            padding: clamp(15px, 4vw, 30px) 2vw 10px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 
+                0 4px 15px rgba(191, 164, 54, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            font-size: clamp(1em, 2.2vw, 1.1em);
+            border: 1px solid rgba(191, 164, 54, 0.2);
+            transform-style: preserve-3d;
         }
 
         .supported-formats h3 {
@@ -535,13 +747,21 @@
         }
 
         .format-tag {
-            background: #bfa436;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 13px;
-            font-size: .97em;
-            font-weight: 500;
-            margin-bottom: 8px;
+            background: linear-gradient(135deg, #bfa436, #ffd700);
+            color: #1a1a2e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(191, 164, 54, 0.3);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .format-tag:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(191, 164, 54, 0.5);
         }
 
         @media (max-width: 600px) {
@@ -709,13 +929,37 @@
         }
 
         @media (max-width: 390px) {
-
             .container,
             .header p,
             .status,
             .download-btn,
             .audio-preview {
                 font-size: .92em;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+                letter-spacing: 1px;
+            }
+
+            .upload-icon {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Performance optimizations for mobile */
+        @media (max-width: 768px) {
+            .container:hover {
+                transform: none; /* Disable 3D hover effects on mobile */
+            }
+
+            .upload-area:hover {
+                transform: translateY(-2px); /* Simplified hover effect */
+            }
+
+            .process-btn:hover {
+                transform: translateY(-2px) scale(1.02); /* Simplified hover effect */
             }
         }
     </style>
@@ -728,6 +972,29 @@
         style="display:none;position:fixed;z-index:44;bottom:55px;left:0;width:100vw;text-align:center;font-size:.99em;background:#fffde6;color:#bfa436;padding:9px 0;box-shadow:0 0 16px #bfa43625;font-family:'Montserrat';">
         <span id="pwa-hint-content"></span>
     </div>
+    <!-- 3D Background Elements -->
+    <div class="bg-3d-container">
+        <div class="floating-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="audio-waves">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+    </div>
+
+    <!-- 3D Audio Visualizer Canvas -->
+    <canvas id="audioVisualizer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none;"></canvas>
+
     <div class="toggle-theme" id="tm-toggle" onclick="toggleTheme()" aria-role="button"
         aria-label="Toggle light/dark mode" tabindex="0">🌙 <span id="tmt-txt">Dark</span>
         <div class="toggle-slider"></div>
@@ -735,18 +1002,27 @@
     <div class="container" aria-label="Main Card">
         <div class="header">
             <h1>🎧 DeNoiser By ShubhDev</h1>
-            <p>Upload your audio and watch background noise disappear.<br>Fast, clean, and magic. Free forever!</p>
+            <p>Experience the future of audio cleaning with our revolutionary 3D AI technology.<br>Upload, visualize, and transform your audio into crystal-clear perfection!</p>
         </div>
         <div class="upload-area" onclick="document.getElementById('fileInput').click()" tabindex="0"
             aria-label="Select or drop audio files">
             <div class="upload-icon">
-                <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                    <ellipse cx="30" cy="30" rx="28" ry="27" stroke="#bfa436" stroke-width="3" />
-                    <rect x="28" y="16" width="4" height="22" rx="2" fill="#bfa436" />
-                    <rect x="21.5" y="20" width="4" height="14" rx="2" fill="#153464" />
-                    <rect x="34.5" y="22" width="4" height="11" rx="2" fill="#153464" />
-                    <rect x="41" y="25" width="3" height="6" rx="1.5" fill="#bfa436" />
-                    <rect x="16" y="27" width="3" height="5" rx="1.5" fill="#bfa436" />
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="filter: drop-shadow(0 0 20px rgba(191, 164, 54, 0.5));">
+                    <defs>
+                        <linearGradient id="audioGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#bfa436;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#ffd700;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#bfa436;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="40" cy="40" r="35" fill="url(#audioGradient)" opacity="0.1" />
+                    <ellipse cx="40" cy="40" rx="32" ry="30" stroke="url(#audioGradient)" stroke-width="3" />
+                    <rect x="36" y="20" width="6" height="30" rx="3" fill="url(#audioGradient)" />
+                    <rect x="28" y="25" width="6" height="20" rx="3" fill="url(#audioGradient)" />
+                    <rect x="46" y="27" width="6" height="16" rx="3" fill="url(#audioGradient)" />
+                    <rect x="52" y="30" width="4" height="10" rx="2" fill="url(#audioGradient)" />
+                    <rect x="24" y="32" width="4" height="8" rx="2" fill="url(#audioGradient)" />
+                    <circle cx="40" cy="40" r="3" fill="url(#audioGradient)" />
                 </svg>
             </div>
             <div class="upload-text">Click to upload or drag & drop your audio files</div>
@@ -999,6 +1275,111 @@
                 pwaDom.style.display = 'none';
             }
         }
+        // 3D Audio Visualizer
+        let scene, camera, renderer, audioVisualizer;
+        let audioContext, analyser, dataArray;
+        let bars = [];
+        let isVisualizerActive = false;
+
+        function init3DVisualizer() {
+            const canvas = document.getElementById('audioVisualizer');
+            if (!canvas) return;
+
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+
+            // Create audio bars
+            const barCount = 64;
+            const barWidth = 0.5;
+            const barSpacing = 0.6;
+
+            for (let i = 0; i < barCount; i++) {
+                const geometry = new THREE.BoxGeometry(barWidth, 1, barWidth);
+                const material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(0.15, 0.8, 0.5 + Math.random() * 0.3)
+                });
+                const bar = new THREE.Mesh(geometry, material);
+                
+                bar.position.x = (i - barCount / 2) * barSpacing;
+                bar.position.y = -10;
+                bar.position.z = -20;
+                
+                scene.add(bar);
+                bars.push(bar);
+            }
+
+            camera.position.z = 30;
+            animate3D();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            
+            if (isVisualizerActive && analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                
+                bars.forEach((bar, index) => {
+                    const dataIndex = Math.floor(index * dataArray.length / bars.length);
+                    const height = (dataArray[dataIndex] / 255) * 20;
+                    bar.scale.y = Math.max(0.1, height);
+                    bar.position.y = height / 2 - 10;
+                    
+                    // Color animation
+                    const hue = (0.15 + (dataArray[dataIndex] / 255) * 0.1) % 1;
+                    bar.material.color.setHSL(hue, 0.8, 0.5 + (dataArray[dataIndex] / 255) * 0.3);
+                });
+            } else {
+                // Idle animation
+                bars.forEach((bar, index) => {
+                    const time = Date.now() * 0.001;
+                    const height = 2 + Math.sin(time * 2 + index * 0.1) * 1.5;
+                    bar.scale.y = height;
+                    bar.position.y = height / 2 - 10;
+                });
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        function startAudioVisualizer() {
+            if (isVisualizerActive) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                isVisualizerActive = true;
+            } catch (e) {
+                console.log('Audio context not supported');
+            }
+        }
+
+        function stopAudioVisualizer() {
+            isVisualizerActive = false;
+            if (audioContext) {
+                audioContext.close();
+            }
+        }
+
+        // Initialize 3D visualizer on load
+        window.addEventListener('load', () => {
+            init3DVisualizer();
+            startAudioVisualizer();
+        });
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
         // Service worker registration for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/service-worker.js').catch(() => {});
