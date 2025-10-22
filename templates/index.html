@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>DeNoiser By ShubhDev</title>
-    <meta name="theme-color" content="#bfa436">
-    <meta property="og:title" content="DeNoiser By ShubhDev – AI audio noise removal">
+    <title>DeNoiser 3D - AI Audio Magic</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta property="og:title" content="DeNoiser 3D – Revolutionary AI Audio Noise Removal">
     <meta property="og:description"
-        content="Remove background noise from any audio with style. Batch upload, denoise, download.">
+        content="Experience the future of audio processing with our 3D-powered AI denoising technology. Transform your audio with stunning visual feedback.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/static/icon512.png">
     <meta name="description"
-        content="DeNoiser By ShubhDev: AI noise remover. Drag & drop, preview, batch, download zip, dark mode & more!">
+        content="DeNoiser 3D: Next-generation AI audio processing with immersive 3D visualization. Drag, drop, watch the magic happen in real-time!">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,229 +21,239 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/icon180.png">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon.svg">
-    <!-- Optionally: fallback to old PNG/ICO for legacy browsers if desired -->
     <link rel="icon" type="image/png" sizes="512x512" href="/static/icon512.png">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&family=Inter:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     {% raw %}
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         html,
         body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', 'Montserrat', Arial, sans-serif;
+            font-family: 'Space Grotesk', 'Inter', Arial, sans-serif;
             font-size: clamp(15px, 2.7vw, 19px);
-            background: #f7f7f7;
+            background: #0a0a0f;
+            overflow-x: hidden;
         }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(0deg, #faf9f6 0%, #ececec 100%);
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f23 50%, #000000 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            transition: background .5s;
+            transition: all 0.5s ease;
+        }
+
+        /* 3D Background Canvas */
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Glowing Orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
         }
 
         :root {
-            --classic-bg: #f7f7f7;
-            --classic-nav: #fff;
-            --classic-card: #fff;
-            --classic-tone: #153464;
-            --classic-gold: #bfa436;
-            --classic-text: #3e456b;
-            --classic-shadow: 0 4px 32px 0 rgba(33, 42, 77, 0.125);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+            --accent-color: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-accent: #fbbf24;
+            --bg-primary: rgba(15, 15, 35, 0.95);
+            --bg-secondary: rgba(26, 26, 46, 0.8);
+            --border-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+            --shadow-3d: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
 
-        body.dark {
-            background: linear-gradient(0deg, #181d23 0%, #272b31 100%);
+        /* 3D Glass Morphism */
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-3d);
         }
 
-        body.dark .container {
-            background: #232531;
-            box-shadow: 0 0px 32px 0 #111a25d8;
-            color: #f5f5f5;
+        /* Neon Glow Effects */
+        .neon-glow {
+            box-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 15px currentColor,
+                0 0 20px currentColor;
         }
 
-        body.dark h1,
-        body.dark label,
-        body.dark .supported-formats h3 {
-            color: #f7f6e2;
+        /* 3D Transform Utilities */
+        .transform-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
 
-        body.dark .header p {
-            color: #b3b9c8;
+        .rotate-x {
+            transform: rotateX(15deg);
         }
 
-        body.dark .upload-area {
-            background: #181d26;
-            border-color: #44495a;
+        .rotate-y {
+            transform: rotateY(15deg);
         }
 
-        body.dark .upload-area:hover,
-        body.dark .upload-area.dragover {
-            background: #272634;
-            border-color: #f7c873;
-        }
-
-        body.dark .upload-hint,
-        body.dark .slider-value {
-            color: #f2d771 !important;
-        }
-
-        body.dark .process-btn {
-            background: linear-gradient(90deg, #bfa436 0%, #232641 100%);
-            color: #f7f7f7;
-        }
-
-        body.dark .process-btn:hover {
-            background: linear-gradient(90deg, #232641 7%, #bfa436 93%);
-            color: #fff;
-        }
-
-        body.dark .progress-bar {
-            background: #232537;
-        }
-
-        body.dark .progress-fill {
-            background: linear-gradient(90deg, #bfa436 0%, #232641 100%);
-        }
-
-        body.dark .download-btn {
-            background: #bfa436;
-            color: #232531;
-        }
-
-        body.dark .download-btn:hover {
-            background: #232641;
-            color: #bfa436;
-        }
-
-        body.dark .slider {
-            background: #1c1e2c;
-        }
-
-        body.dark .supported-formats {
-            background: #232537;
-        }
-
-        body.dark footer {
-            color: #bfa436;
-        }
-
-        body.dark .format-tag {
-            background: #bfa436;
-        }
-
-        body.dark .status.success {
-            background: #2e4e2e;
-            color: #a0faab;
-            border: 1px solid #25bb35;
-        }
-
-        body.dark .status.error {
-            background: #552013;
-            color: #fff7e6;
-            border: 1px solid #eea88e;
-        }
-
-        body.dark .status.info {
-            background: #2c2737;
-            color: #f3d473;
-            border: 1px solid #bfa436a6;
+        .scale-3d {
+            transform: scale3d(1.05, 1.05, 1.05);
         }
 
         .toggle-theme {
             position: absolute;
             top: 20px;
             right: 32px;
-            z-index: 2;
+            z-index: 10;
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 1.5px 12px #bfa43626;
-            padding: 6px 16px;
+            gap: 12px;
+            background: var(--bg-primary);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--border-glow);
+            padding: 8px 20px;
             cursor: pointer;
             user-select: none;
-            font-size: 1.12em;
-            font-family: 'Montserrat';
+            font-size: 1.1em;
+            font-family: 'Orbitron', monospace;
             font-weight: 600;
-            color: var(--classic-tone);
-            border: 1.7px solid #edeed6;
-            transition: background .3s;
+            color: var(--text-accent);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(0);
         }
 
-        body.dark .toggle-theme {
-            background: #1b1a23;
-            color: #dec856;
-            border-color: #56566e;
+        .toggle-theme:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
         }
 
         .toggle-slider {
-            width: 36px;
-            height: 18px;
-            background: #ececec;
-            border-radius: 9px;
+            width: 40px;
+            height: 20px;
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-radius: 10px;
             position: relative;
             display: inline-block;
             margin-left: 8px;
             vertical-align: middle;
-            transition: background .38s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .toggle-slider:before {
             content: '';
-            background: var(--classic-gold);
-            width: 13px;
-            height: 13px;
+            background: var(--primary-gradient);
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             position: absolute;
-            top: 2.5px;
-            left: 3px;
-            transition: .3s cubic-bezier(.9, 0, .8, .6);
+            top: 2px;
+            left: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
         }
 
-        body.dark .toggle-slider {
-            background: #292d32;
-        }
-
-        body.dark .toggle-slider:before {
-            background: #fff;
-            left: 20px;
+        .toggle-theme.active .toggle-slider:before {
+            left: 22px;
+            background: var(--secondary-gradient);
         }
 
         .container {
-            background: #fff;
-            border-radius: clamp(10px, 2vw, 18px);
-            box-shadow: 0 4px 32px 0 rgba(33, 42, 77, 0.13);
-            padding: clamp(18px, 6vw, 58px) clamp(8px, 4vw, 34px) clamp(20px, 6vw, 36px);
+            background: var(--bg-primary);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-3d);
+            padding: clamp(24px, 6vw, 64px) clamp(12px, 4vw, 40px) clamp(24px, 6vw, 40px);
             max-width: 98vw;
             width: 100%;
             min-width: 0;
-            max-width: 470px;
+            max-width: 520px;
             text-align: center;
-            z-index: 2;
+            z-index: 5;
             position: relative;
-            animation: containerIn .7s cubic-bezier(.33, 1.53, .42, .91) forwards;
+            animation: containerIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
             opacity: 0;
             margin-top: clamp(8px, 8vw, 48px);
             margin-bottom: clamp(12px, 8vw, 44px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateZ(0);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            background: var(--primary-gradient);
+            opacity: 0.1;
+            z-index: -1;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.2; }
         }
 
         @keyframes containerIn {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            from {
+            0% {
                 opacity: 0;
-                transform: scale(.98);
+                transform: translateY(50px) rotateX(20deg) scale(0.9);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-10px) rotateX(5deg) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
             }
         }
 
@@ -261,32 +271,71 @@
         }
 
         .header h1 {
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            font-size: clamp(1.25em, 5vw, 2.2em);
-            margin: 0 0 6px;
-            color: #153464;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px #faf9f6a8;
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: clamp(1.8em, 6vw, 3.2em);
+            margin: 0 0 16px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            position: relative;
+        }
+
+        .header h1::after {
+            content: '🎵';
+            position: absolute;
+            right: -40px;
+            top: 0;
+            font-size: 0.6em;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3)); }
+            100% { filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6)); }
         }
 
         .header p {
-            color: #626872;
-            font-size: clamp(1em, 3vw, 1.15em);
-            font-weight: 500;
-            letter-spacing: .1px;
+            color: var(--text-secondary);
+            font-size: clamp(1.1em, 3.5vw, 1.3em);
+            font-weight: 400;
+            letter-spacing: 0.5px;
             margin-bottom: 0;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .upload-area {
-            border: 2.5px dashed #abb2bc;
-            border-radius: clamp(11px, 2vw, 18px);
-            padding: clamp(17px, 6vw, 35px) 3vw;
-            margin: clamp(18px, 4vw, 32px) 0 clamp(6px, 2vw, 16px);
-            transition: border-color 0.25s, background 0.28s, box-shadow .25s;
+            border: 2px dashed rgba(99, 102, 241, 0.4);
+            border-radius: 20px;
+            padding: clamp(24px, 6vw, 40px) 3vw;
+            margin: clamp(24px, 4vw, 40px) 0 clamp(12px, 2vw, 20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            background: #f2f2f6;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
             position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
         }
 
         @media (max-width:500px) {
@@ -297,44 +346,67 @@
 
         .upload-area:hover,
         .upload-area.dragover {
-            border-color: #bfa436;
-            background: #faf3e5;
-            box-shadow: 0 2px 12px #bfa43622;
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 
+                0 0 30px rgba(99, 102, 241, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .upload-icon {
-            width: clamp(32px, 7vw, 60px);
-            height: clamp(32px, 7vw, 60px);
+            width: clamp(48px, 8vw, 80px);
+            height: clamp(48px, 8vw, 80px);
             display: inline-block;
-            margin-bottom: clamp(2px, 3vw, 17px);
-            transition: transform .28s cubic-bezier(.36, 1.6, .48, .87);
-            animation: bounce 2.5s infinite alternate cubic-bezier(.36, 1.6, .48, .87);
+            margin-bottom: clamp(8px, 3vw, 20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: float3D 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .upload-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.2;
+            animation: pulse 2s ease-in-out infinite;
+            z-index: -1;
         }
 
         .upload-area:hover .upload-icon,
         .upload-area.dragover .upload-icon {
-            transform: scale(1.14) rotate(-6deg);
+            transform: scale(1.2) rotateY(15deg) rotateX(10deg);
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6));
         }
 
-        @keyframes bounce {
-            from {
-                transform: translateY(0px);
+        @keyframes float3D {
+            0%, 100% { 
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg); 
             }
-
-            to {
-                transform: translateY(-8px);
+            50% { 
+                transform: translateY(-12px) rotateX(5deg) rotateY(5deg); 
             }
         }
 
         .upload-text {
-            font-size: clamp(1em, 3vw, 1.08em);
-            color: #3e456b;
-            margin-bottom: 7px;
+            font-size: clamp(1.1em, 3.5vw, 1.3em);
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .upload-hint {
-            font-size: clamp(1em, 3vw, 1.08em);
-            color: #989575;
+            font-size: clamp(0.95em, 2.8vw, 1.1em);
+            color: var(--text-secondary);
+            font-weight: 400;
+            opacity: 0.8;
         }
 
         #fileInput {
@@ -406,34 +478,61 @@
         }
 
         .process-btn {
-            background: linear-gradient(90deg, #153464 0%, #bfa436 100%);
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: clamp(11px, 2vw, 18px) 0;
-            font-size: clamp(.98em, 2.8vw, 1.15em);
-            border-radius: 24px;
+            padding: clamp(16px, 3vw, 24px) 0;
+            font-size: clamp(1.1em, 3vw, 1.3em);
+            border-radius: 30px;
             cursor: pointer;
-            font-family: 'Montserrat', Arial, sans-serif;
+            font-family: 'Orbitron', monospace;
             font-weight: 700;
-            transition: box-shadow .26s, transform .08s, background .31s;
-            margin: clamp(16px, 3vw, 24px) 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: clamp(20px, 4vw, 32px) 0;
             max-width: 95vw;
-            letter-spacing: 0.01em;
-            box-shadow: 0 4px 16px 0 #bfa43616;
+            letter-spacing: 1px;
+            box-shadow: 
+                0 8px 32px rgba(99, 102, 241, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
             outline: none;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        .process-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .process-btn:hover::before {
+            left: 100%;
         }
 
         .process-btn:disabled {
-            background: #edeaea;
-            color: #b2b2b2;
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            color: #6b7280;
             cursor: not-allowed;
             box-shadow: none;
+            opacity: 0.6;
         }
 
-        .process-btn:hover {
-            box-shadow: 0 7px 18px 0 #bfa43633;
-            transform: translateY(-1.5px) scale(1.012);
-            background: linear-gradient(90deg, #bfa436 7%, #153464 90%);
+        .process-btn:hover:not(:disabled) {
+            box-shadow: 
+                0 12px 40px rgba(99, 102, 241, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px) scale(1.05);
+            background: var(--secondary-gradient);
+        }
+
+        .process-btn:active:not(:disabled) {
+            transform: translateY(-1px) scale(1.02);
         }
 
         .progress-container {
@@ -485,63 +584,92 @@
         }
 
         .download-btn {
-            background: #153464;
+            background: var(--primary-gradient);
             color: #fff;
             border: none;
-            padding: 13px 27px;
-            font-size: clamp(.98em, 2.8vw, 1.07em);
-            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: clamp(1em, 3vw, 1.2em);
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.19s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
             display: inline-block;
-            margin-top: 14px;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 600;
-            letter-spacing: .04em;
-            box-shadow: 0 3px 10px #6d748933;
-            min-width: 33vw;
+            margin-top: 16px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+            min-width: 35vw;
             max-width: 99vw;
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
         }
 
         .download-btn:hover {
-            background: #bfa436;
-            color: #153464;
-            border: 1px solid #153464;
+            background: var(--secondary-gradient);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
         }
 
         .supported-formats {
-            margin-top: clamp(21px, 4vw, 39px);
-            padding: clamp(12px, 3vw, 25px) 1vw 7px;
-            background: #f8f8f8;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px #bfa4360b;
-            font-size: clamp(.97em, 2vw, 1em);
+            margin-top: clamp(24px, 4vw, 40px);
+            padding: clamp(16px, 3vw, 28px) 1vw 12px;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: var(--border-glow);
+            font-size: clamp(1em, 2.2vw, 1.1em);
+            border: 1px solid rgba(99, 102, 241, 0.2);
         }
 
         .supported-formats h3 {
-            color: #153464;
-            margin-bottom: 8px;
-            font-family: 'Montserrat';
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-family: 'Orbitron', monospace;
             font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .format-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 6px;
             justify-content: center;
         }
 
         .format-tag {
-            background: #bfa436;
+            background: var(--primary-gradient);
             color: white;
-            padding: 5px 12px;
-            border-radius: 13px;
-            font-size: .97em;
-            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            font-weight: 600;
             margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .format-tag:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
         }
 
         @media (max-width: 600px) {
@@ -678,8 +806,91 @@
         }
 
         .audio-preview {
-            margin: 18px 0 0 0;
+            margin: 24px 0 0 0;
             text-align: center;
+        }
+
+        /* 3D Audio Visualizer */
+        .audio-visualizer {
+            width: 100%;
+            height: 120px;
+            margin: 20px 0;
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .visualizer-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+        }
+
+        .waveform-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waveform-bar {
+            width: 4px;
+            background: var(--primary-gradient);
+            margin: 0 2px;
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* 3D Progress Bar */
+        .progress-container {
+            display: none;
+            margin: 24px 0 8px;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            border-radius: 6px;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .playall-btn {
@@ -732,21 +943,45 @@
         aria-label="Toggle light/dark mode" tabindex="0">🌙 <span id="tmt-txt">Dark</span>
         <div class="toggle-slider"></div>
     </div>
+    
+    <!-- 3D Background Canvas -->
+    <canvas id="three-canvas"></canvas>
+    
+    <!-- Floating Particles -->
+    <div class="particle" style="top: 20%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 60%; left: 80%; width: 6px; height: 6px; animation-delay: 1s;"></div>
+    <div class="particle" style="top: 80%; left: 20%; width: 3px; height: 3px; animation-delay: 2s;"></div>
+    <div class="particle" style="top: 30%; left: 70%; width: 5px; height: 5px; animation-delay: 3s;"></div>
+    <div class="particle" style="top: 70%; left: 50%; width: 4px; height: 4px; animation-delay: 4s;"></div>
+    
+    <!-- Glowing Orbs -->
+    <div class="glow-orb" style="top: 10%; left: 20%; width: 200px; height: 200px; animation-delay: 0s;"></div>
+    <div class="glow-orb" style="top: 60%; right: 10%; width: 150px; height: 150px; animation-delay: 2s;"></div>
+    <div class="glow-orb" style="bottom: 20%; left: 50%; width: 100px; height: 100px; animation-delay: 4s;"></div>
     <div class="container" aria-label="Main Card">
         <div class="header">
-            <h1>🎧 DeNoiser By ShubhDev</h1>
-            <p>Upload your audio and watch background noise disappear.<br>Fast, clean, and magic. Free forever!</p>
+            <h1>DeNoiser 3D</h1>
+            <p>Experience the future of audio processing with our revolutionary 3D-powered AI denoising technology.<br>Watch your audio transform in real-time with stunning visual feedback!</p>
         </div>
         <div class="upload-area" onclick="document.getElementById('fileInput').click()" tabindex="0"
             aria-label="Select or drop audio files">
             <div class="upload-icon">
-                <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                    <ellipse cx="30" cy="30" rx="28" ry="27" stroke="#bfa436" stroke-width="3" />
-                    <rect x="28" y="16" width="4" height="22" rx="2" fill="#bfa436" />
-                    <rect x="21.5" y="20" width="4" height="14" rx="2" fill="#153464" />
-                    <rect x="34.5" y="22" width="4" height="11" rx="2" fill="#153464" />
-                    <rect x="41" y="25" width="3" height="6" rx="1.5" fill="#bfa436" />
-                    <rect x="16" y="27" width="3" height="5" rx="1.5" fill="#bfa436" />
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <defs>
+                        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="40" cy="40" r="35" stroke="url(#gradient1)" stroke-width="3" fill="none" opacity="0.3"/>
+                    <circle cx="40" cy="40" r="25" stroke="url(#gradient1)" stroke-width="2" fill="none" opacity="0.6"/>
+                    <rect x="36" y="20" width="8" height="30" rx="4" fill="url(#gradient1)" />
+                    <rect x="28" y="26" width="6" height="18" rx="3" fill="url(#gradient1)" opacity="0.8"/>
+                    <rect x="46" y="28" width="6" height="16" rx="3" fill="url(#gradient1)" opacity="0.8"/>
+                    <rect x="54" y="32" width="4" height="8" rx="2" fill="url(#gradient1)" opacity="0.6"/>
+                    <rect x="22" y="34" width="4" height="6" rx="2" fill="url(#gradient1)" opacity="0.6"/>
+                    <circle cx="40" cy="40" r="3" fill="url(#gradient1)" opacity="0.9"/>
                 </svg>
             </div>
             <div class="upload-text">Click to upload or drag & drop your audio files</div>
@@ -767,12 +1002,17 @@
             </div>
         </div>
         <button class="process-btn" id="processBtn" onclick="processAudio()" disabled aria-label="Process Audio"
-            tabindex="0">🚀 Process Audio</button>
+            tabindex="0">🚀 Process Audio in 3D</button>
         <div class="progress-container" id="progressContainer" aria-hidden="true">
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div style="margin-top: 10px; color: #6e6c60;">Processing your audio...</div>
+            <div style="margin-top: 12px; color: var(--text-secondary); font-weight: 500;">Processing your audio with AI magic...</div>
+        </div>
+        
+        <!-- 3D Audio Visualizer -->
+        <div class="audio-visualizer" id="audioVisualizer" style="display: none;">
+            <canvas class="visualizer-canvas" id="visualizerCanvas"></canvas>
         </div>
         <div class="status" id="status" role="status"></div>
         <div class="audio-preview" id="audioPreview" style="margin:18px 0 0 0;"></div>
@@ -787,34 +1027,178 @@
         </div>
     </div>
     <footer
-        style="margin-top:32px;width:100vw;text-align:center;font-size:clamp(.82em,2vw,.97em);color:#626872;letter-spacing:.03em;background:transparent;font-family: 'Inter', 'Montserrat', Arial, sans-serif;position:fixed;left:0;right:0;bottom:5px;z-index:1;user-select:none;pointer-events:none;">
-        All Rights Reserved - Shubham Tiwari (Developer - DeNoiser)</footer>
+        style="margin-top:32px;width:100vw;text-align:center;font-size:clamp(.85em,2.2vw,1em);color:var(--text-secondary);letter-spacing:.05em;background:transparent;font-family: 'Space Grotesk', 'Inter', Arial, sans-serif;position:fixed;left:0;right:0;bottom:8px;z-index:1;user-select:none;pointer-events:none;text-shadow:0 2px 4px rgba(0,0,0,0.3);">
+        ✨ All Rights Reserved - Shubham Tiwari (Developer - DeNoiser 3D) ✨</footer>
     <div id="overlay-block"><span class="button-spinner"></span></div>
     {% raw %}
     <script>
         let selectedFiles = [];
         const maxBatch = 10;
         let lastResult = null;
+        let scene, camera, renderer, audioVisualizer;
+        let animationId;
+
+        // Initialize 3D scene
+        function init3DScene() {
+            const canvas = document.getElementById('three-canvas');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+
+            // Add floating geometric shapes
+            const geometry = new THREE.IcosahedronGeometry(0.5, 0);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x6366f1, 
+                wireframe: true, 
+                transparent: true, 
+                opacity: 0.3 
+            });
+
+            for (let i = 0; i < 20; i++) {
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                mesh.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                scene.add(mesh);
+            }
+
+            camera.position.z = 5;
+            animate3D();
+        }
+
+        function animate3D() {
+            animationId = requestAnimationFrame(animate3D);
+            
+            scene.children.forEach((child, index) => {
+                if (child instanceof THREE.Mesh) {
+                    child.rotation.x += 0.01;
+                    child.rotation.y += 0.01;
+                    child.position.y += Math.sin(Date.now() * 0.001 + index) * 0.001;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize audio visualizer
+        function initAudioVisualizer() {
+            const canvas = document.getElementById('visualizerCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const bars = 50;
+            const barWidth = canvas.width / bars;
+            const barHeights = new Array(bars).fill(0);
+
+            function drawVisualizer() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Create gradient
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                gradient.addColorStop(0, '#6366f1');
+                gradient.addColorStop(0.5, '#8b5cf6');
+                gradient.addColorStop(1, '#ec4899');
+
+                barHeights.forEach((height, index) => {
+                    const x = index * barWidth;
+                    const barHeight = height * canvas.height * 0.8;
+                    const y = canvas.height - barHeight;
+
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, y, barWidth - 2, barHeight);
+                });
+
+                // Animate bars
+                barHeights.forEach((height, index) => {
+                    barHeights[index] = Math.max(0, height - 0.05);
+                    if (Math.random() < 0.1) {
+                        barHeights[index] = Math.random();
+                    }
+                });
+
+                requestAnimationFrame(drawVisualizer);
+            }
+
+            drawVisualizer();
+        }
+
+        // Enhanced file handling with 3D effects
+        function handleFileSelectBatch(fileList) {
+            const allowedExtensions = ['wav', 'mp3', 'flac', 'm4a', 'aac', 'ogg', 'wma'];
+            let files = Array.from(fileList).filter(f => allowedExtensions.includes(f.name.split('.').pop()
+                .toLowerCase()));
+            if (files.length > maxBatch) {
+                files = files.slice(0, maxBatch);
+                showStatus('Maximum ' + maxBatch + ' files at a time', 'error');
+            }
+            if (files.length === 0) {
+                showStatus('Select at least one supported file (WAV, MP3, FLAC, M4A, AAC, OGG, WMA)', 'error');
+                document.getElementById('processBtn').disabled = true;
+                displaySelectedFiles([]);
+                return;
+            }
+            selectedFiles = files;
+            document.getElementById('processBtn').disabled = false;
+            displaySelectedFiles(files);
+            showStatus('Files selected successfully. Ready to process!', 'success');
+            document.getElementById('audioPreview').innerHTML = "";
+            
+            // Show 3D visualizer
+            document.getElementById('audioVisualizer').style.display = 'block';
+            initAudioVisualizer();
+        }
         // Add overlay logic for process feedback
         function setOverlay(show) {
             document.getElementById('overlay-block').classList.toggle('active', !!show);
         }
 
-        // Dark mode toggle
+        // Enhanced theme toggle with 3D effects
         function setTheme(dark) {
-            document.body.classList.toggle('dark', dark);
+            const toggle = document.getElementById('tm-toggle');
+            toggle.classList.toggle('active', dark);
             document.getElementById('tmt-txt').innerText = dark ? 'Light' : 'Dark';
             window.localStorage.setItem('theme', dark ? 'dark' : 'light');
+            
+            // Add 3D rotation effect
+            toggle.style.transform = 'rotateY(180deg)';
+            setTimeout(() => {
+                toggle.style.transform = 'rotateY(0deg)';
+            }, 300);
         }
 
         function toggleTheme() {
-            setTheme(!document.body.classList.contains('dark'));
+            setTheme(!document.getElementById('tm-toggle').classList.contains('active'));
         }
         window.onload = function () {
-            setTheme((window.localStorage.getItem('theme') || 'light') === 'dark');
+            setTheme((window.localStorage.getItem('theme') || 'dark') === 'dark');
             applyMobileClass();
             pwaHint();
+            init3DScene();
+            
+            // Add entrance animations
+            setTimeout(() => {
+                document.querySelector('.container').style.animation = 'containerIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+            }, 100);
         };
+
+        // Handle window resize for 3D scene
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
 
         // Multi-file UI/logic
         function displaySelectedFiles(files) {
@@ -876,19 +1260,30 @@
             }
             document.getElementById('audioPreview').innerHTML = "";
             setOverlay(true);
+            
+            // Add 3D processing animation
+            const processBtn = document.getElementById('processBtn');
+            processBtn.style.transform = 'scale(0.95)';
+            processBtn.innerHTML = '🔄 Processing in 3D...';
+            
             const formData = new FormData();
             selectedFiles.forEach((file, idx) => formData.append('file' + idx, file));
             formData.append('num_files', selectedFiles.length);
             formData.append('noise_level', document.getElementById('noiseLevel').value / 100);
             document.getElementById('processBtn').disabled = true;
             document.getElementById('progressContainer').style.display = 'block';
-            showStatus('Processing your audio files...', 'info');
+            showStatus('Processing your audio files with AI magic...', 'info');
+            
             let progress = 0;
             const progressInterval = setInterval(() => {
-                progress += Math.random() * 15;
+                progress += Math.random() * 12;
                 if (progress > 90) progress = 90;
                 document.getElementById('progressFill').style.width = progress + '%';
-            }, 200);
+                
+                // Add 3D effect to progress bar
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.boxShadow = `0 0 ${progress * 2}px rgba(99, 102, 241, 0.6)`;
+            }, 250);
             try {
                 const response = await fetch('/upload', {
                     method: 'POST',
@@ -908,33 +1303,43 @@
                 }
                 lastResult = result;
                 if (result.success) {
+                    // Reset button with 3D effect
+                    processBtn.style.transform = 'scale(1)';
+                    processBtn.innerHTML = '✨ Process Audio in 3D';
+                    
                     if (result.zip_url) {
-                        showStatus('All audio processed!', 'success');
+                        showStatus('🎉 All audio processed with 3D magic!', 'success');
                         const downloadBtn = document.createElement('a');
                         downloadBtn.href = result.zip_url;
                         downloadBtn.className = 'download-btn';
                         downloadBtn.textContent = '⬇️ Download All (ZIP)';
                         downloadBtn.download = result.zip_name || 'denoised_audio.zip';
+                        downloadBtn.style.background = 'var(--primary-gradient)';
+                        downloadBtn.style.boxShadow = '0 8px 32px rgba(99, 102, 241, 0.3)';
                         document.getElementById('status').appendChild(downloadBtn);
                         document.getElementById('audioPreview').innerHTML =
-                            `You can extract ZIP and preview files locally.<br>  a0 <button class='playall-btn' onclick='playAllPreviews()'>▶️ Play All (Extract & Play)</button>`;
+                            `You can extract ZIP and preview files locally.<br><button class='playall-btn' onclick='playAllPreviews()'>▶️ Play All (Extract & Play)</button>`;
                     } else if (result.download_url) {
-                        showStatus('Audio processed successfully!', 'success');
+                        showStatus('🎉 Audio processed successfully with 3D magic!', 'success');
                         const downloadBtn = document.createElement('a');
                         downloadBtn.href = result.download_url;
                         downloadBtn.className = 'download-btn';
                         downloadBtn.textContent = '⬇️ Download Clean Audio';
                         downloadBtn.download = result.output_filename;
+                        downloadBtn.style.background = 'var(--primary-gradient)';
+                        downloadBtn.style.boxShadow = '0 8px 32px rgba(99, 102, 241, 0.3)';
                         document.getElementById('status').appendChild(downloadBtn);
                         let audioPrev =
-                            `<audio controls id='single-audio' style='margin-top: 12px; width:99%; max-width:410px;border-radius:12px;box-shadow:0 2px 16px #bfa4362b;'><source src='${result.download_url}' type='audio/mpeg'><source src='${result.download_url}' type='audio/wav'>Your browser cannot play this file.</audio>`;
+                            `<audio controls id='single-audio' style='margin-top: 16px; width:99%; max-width:450px;border-radius:16px;box-shadow:0 8px 32px rgba(99, 102, 241, 0.3);'><source src='${result.download_url}' type='audio/mpeg'><source src='${result.download_url}' type='audio/wav'>Your browser cannot play this file.</audio>`;
                         document.getElementById('audioPreview').innerHTML = audioPrev;
                         let shareBtn = document.createElement('button');
                         shareBtn.innerText = 'Share';
                         shareBtn.className = 'process-btn';
-                        shareBtn.style.background = '#2b3e6c';
+                        shareBtn.style.background = 'var(--secondary-gradient)';
                         shareBtn.style.color = '#fff';
-                        shareBtn.style.marginLeft = '10px';
+                        shareBtn.style.marginLeft = '12px';
+                        shareBtn.style.fontSize = '0.9em';
+                        shareBtn.style.padding = '12px 20px';
                         shareBtn.onclick = () => shareAudio(result.download_url, result.output_filename);
                         document.getElementById('status').appendChild(shareBtn);
                     } else {
@@ -951,6 +1356,10 @@
             document.getElementById('processBtn').disabled = false;
             document.getElementById('progressContainer').style.display = 'none';
             setOverlay(false);
+            
+            // Reset button state
+            processBtn.innerHTML = '🚀 Process Audio in 3D';
+            processBtn.style.transform = 'scale(1)';
         }
         // showStatus as before
         function showStatus(message, type) {
